@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    container_name: docker_registry
+    ports:
+      - 5000:5000
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: "Registry Realm"
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    volumes:
+      - /mnt/disk1/registry-data:/var/lib/registry
+      - /mnt/disk1/registry-data/auth:/auth
+
+  ui:
+    image: joxit/docker-registry-ui:static
+    container_name: docker_registry_ui
+    ports:
+      - 8080:80
+    environment:
+      - REGISTRY_TITLE=Private Docker Registry
+      - REGISTRY_URL=http://registry:5000
+    depends_on:
+      - registry
